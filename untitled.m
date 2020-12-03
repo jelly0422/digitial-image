@@ -119,13 +119,15 @@ global faces;
 global face_local;
 point=get(gca,'CurrentPoint');%获取鼠标点击的坐标
 hold on
-index=mostClose(point,face_local);
+index=mostClose(point,face_local);%获取与鼠标坐标最近的框的起始坐标
+%%将获取的框截的人脸显示在坐标系中
 axes(handles.axes4);
 imshow(faces{index});
+%%对截出的人脸进行预测
 predictImg=rgb2gray(faces{index});
-predictedLabel=predict(predictImg,index);
-name=result(predictedLabel);
-set(handles.Name,'string',name);
+predictedLabel=predict(predictImg,index);%得到预测后标签
+name=result(predictedLabel);%通过标签获得人名
+set(handles.Name,'string',name);%将人名显示到静态文本中
 
 % --- Executes on button press in pushbutton4.
 %识别图片按钮回调函数
@@ -133,15 +135,19 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+%%获取全局变量
 global Img;
 global faces;
 global face_local;
+%%人脸检测
 axes(handles.axes1);
 [img,result]=facedetetion(Img);
 axes(handles.axes3);
 cla;
+%%框出人脸并显示
 [showImg,position]=show_newImage(img,result);
 showImg=imshow(showImg);
+%通过坐标框出人脸
 for i=1:size(position,1)
     m1=position(i,1);
     m2=position(i,2);
@@ -149,5 +155,6 @@ for i=1:size(position,1)
     m4=position(i,4);
     rectangle('Position',[m1,m2,m3,m4],'EdgeColor','r');
 end
+%绑定图片点击事件
 set(showImg,'buttondownFcn',{@ImageClickCallBack,handles});
 [faces,face_local]=toRecognition(img,result);
